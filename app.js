@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const ejs = require("ejs");
 const path = require("path")
 const methodoverride = require("method-override")
+const ejsMate = require("ejs-mate");
 
 app.use(express.urlencoded({ extended: true }));
 
@@ -26,6 +27,8 @@ app.get("/", (req, res) => {
     res.send("Hey, I am Root")
 });
 app.use(methodoverride("_method"));
+app.engine('ejs', ejsMate);
+app.use(express.static(path.join(__dirname, "public")))
 
 
 //index route
