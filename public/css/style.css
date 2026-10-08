@@ -1,8 +1,8 @@
-body{
-    font-family: "plus Jakarta Sans", sans-serif !important;
+body {
+    font-family: "Plus Jakarta Sans", sans-serif !important;
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    min-height: 100vh;
 }
 .container{
     flex:1;
@@ -55,7 +55,7 @@ padding-top: 0.5rem;
 .f-info{
     text-align: center;
     display: flex;
-    height: 8rm;
+    height: 8rem;
     background-color: #ebebeb;
     flex-wrap: wrap;
     justify-content: center;
@@ -77,9 +77,9 @@ padding-top: 0.5rem;
 .card-body{
     padding: 0 !important;
 }
-.card text p{
+.card-text p{
     font-weight: 400;
-    text-decoration: npo;
+    text-decoration: none;
 }
 
 .listing-links{
