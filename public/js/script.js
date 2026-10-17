@@ -1,5 +1,4 @@
 // Example starter JavaScript for disabling form submissions if there are invalid fields
-console.log("SCRIPT.JS LOADED");
 (() => {
   'use strict'
 

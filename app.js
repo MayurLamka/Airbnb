@@ -5,6 +5,8 @@ const ejs = require("ejs");
 const path = require("path")
 const methodoverride = require("method-override")
 const ejsMate = require("ejs-mate");
+const session = require("express-session");
+const flash = require("connect-flash");
 
 app.use(express.urlencoded({ extended: true }));
 
@@ -28,14 +30,34 @@ async function main() {
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
+
+const sessionOption = {
+    secret: "mysecretcode",
+    resave: false,
+    saveUninitialized: true,
+    cookie:{
+        expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        // httpOnly: true,
+    },
+}
+
 app.get("/", (req, res) => {
     res.send("Hey, I am Root")
 });
+
+app.use(session(sessionOption));
+app.use(flash())
+
+app.use((req, res, next)=>{
+    res.locals.success = req.flash("Success");
+    res.locals.error = req.flash("error");
+    next();
+})
+
 app.use(methodoverride("_method"));
 app.engine('ejs', ejsMate);
 app.use(express.static(path.join(__dirname, "public")))
-
-
 
 
 
