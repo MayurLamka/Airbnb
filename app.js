@@ -7,14 +7,18 @@ const methodoverride = require("method-override")
 const ejsMate = require("ejs-mate");
 const session = require("express-session");
 const flash = require("connect-flash");
+const passport = require("passport");
+const Localstrategy = require("passport-local");
 
-app.use(express.urlencoded({ extended: true }));
+
+
 
 const port = 8080;
-
 const ExpressError = require("./utils/ExpressError.js");
-const listings = require("./Routes/listing.js");
-const reviews = require("./Routes/reviews.js");
+const listingRouter = require("./Routes/listing.js");
+const reviewRouter = require("./Routes/reviews.js");
+const userRouter = require("./Routes/user.js");
+const User = require("./models/user.js")
 
 
 main().then(() => {
@@ -29,13 +33,14 @@ async function main() {
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+app.use(express.urlencoded({ extended: true }));
 
 
 const sessionOption = {
     secret: "mysecretcode",
     resave: false,
     saveUninitialized: true,
-    cookie:{
+    cookie: {
         expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
         maxAge: 7 * 24 * 60 * 60 * 1000,
         // httpOnly: true,
@@ -49,7 +54,14 @@ app.get("/", (req, res) => {
 app.use(session(sessionOption));
 app.use(flash())
 
-app.use((req, res, next)=>{
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new Localstrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+app.use((req, res, next) => {
     res.locals.success = req.flash("Success");
     res.locals.error = req.flash("error");
     next();
@@ -60,9 +72,21 @@ app.engine('ejs', ejsMate);
 app.use(express.static(path.join(__dirname, "public")))
 
 
+// app.get("/demouser", async (req, res)=>{
+//     let fakeUser = new User({
+//             email: "fakeuser@gmail.com",
+//             username: "fekaeuser"
+//     });
 
-app.use("/listings", listings);
-app.use("/listings/:id/reviews", reviews)
+//      let registredUser = await User.register(fakeUser, "fakeuser");
+//  res.send(registredUser);
+// });
+
+
+
+app.use("/listings", listingRouter);
+app.use("/listings/:id/reviews", reviewRouter);
+app.use("/", userRouter);
 
 
 app.all("/*splat", (req, res, next) => {
@@ -73,7 +97,7 @@ app.all("/*splat", (req, res, next) => {
 app.use((err, req, res, next) => {
     let { status = 500, message = "something went wrong" } = err;
     // res.status(status).send(message)
-    res.status(status).render("listing/error.ejs", {message});
+    res.status(status).render("error.ejs", { message });
 });
 
 app.listen(port, () => {
