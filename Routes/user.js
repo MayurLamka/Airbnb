@@ -50,6 +50,17 @@ router.post("/login",
     async (req, res) => {
         req.flash("Success", "Welcome back to wanderlust!");
         let redirectUrl = res.locals.redirectUrl || "/listings"
+
+         if (redirectUrl.includes("/reviews/") &&
+            redirectUrl.includes("_method=DELETE")) {
+            const match = redirectUrl.match(/^\/listings\/([^/]+)/);
+
+            redirectUrl = match
+                ? `/listings/${match[1]}`
+                : "/listings";
+        }
+
+        delete req.session.redirectUrl;
         res.redirect(redirectUrl)
     });
 
